@@ -9,7 +9,7 @@ struct produto {
 };
 
 int main (){
-    int n;
+    int n = 1;
     while (n != 0)
     {
         printf("Qual opção deseja escolher ?\n");
