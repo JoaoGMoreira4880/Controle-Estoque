@@ -11,20 +11,6 @@ int meu_strlen (char *s){
     }
 return contador;
 }
-struct produto {
-    char nome [50];
-    int quantidade;
-    float preco;
-};
-struct prateleira {
-    char gama_produtos [50];
-    int capacidade;
-    int quantidade;
-    struct produto *produtos;
-};
-/*struct produto cadastrar_produto (){
-data 
-};*/
 void tirar_enter(char *s){
     int k = 0;
     int length = meu_strlen(s);
@@ -37,6 +23,37 @@ void tirar_enter(char *s){
         }
     }
 }
+struct produto {
+    char nome [50];
+    int quantidade;
+    float preco;
+};
+struct prateleira {
+    char gama_produtos [50];
+    int capacidade;
+    int quantidade;
+    struct produto *produtos;
+};
+void cadastrar_produto (struct prateleira *p){
+    int pos = p->quantidade; 
+    if (p->quantidade >= p->capacidade)
+    {
+        printf("A prateleira está cheia !\n");
+        return;
+    }
+    printf("Digite o nome do produto: \n");
+    fgets(p->produtos[pos].nome, 50, stdin);
+    tirar_enter(p->produtos[pos].nome);
+    printf("Qual o preço do produto ?\n");
+    scanf("%f", &p->produtos[pos].preco);
+    getchar();
+    printf("Qual a quantidade do produto ?\n");
+    scanf("%d", &p->produtos[pos].quantidade);
+    getchar();
+    p->quantidade++; 
+    printf("[%s] guardado na posicao %d\n", p->produtos[pos].nome, pos);
+}
+
 int main (){
     int n = 1;
     struct prateleira prateleira1;
@@ -44,26 +61,25 @@ int main (){
     printf("Qual prateleira seria ?\n");
     fgets(prateleira1.gama_produtos, 50, stdin);
     tirar_enter(prateleira1.gama_produtos);
-    printf("Quantos produtos cabem na parateleira ?\n");
+    printf("Quantos produtos cabem na prateleira ?\n");
     scanf("%d", &prateleira1.capacidade);
     prateleira1.produtos = NULL;
     prateleira1.produtos = malloc(prateleira1.capacidade * sizeof(struct produto));
     if (prateleira1.produtos == NULL)
     {
-        printf("Operação falhou !");
+        printf("Operação falhou !\n");
         return 1;
     }
-    printf("[%s]", prateleira1.gama_produtos);
-    printf("%d", prateleira1.capacidade);
     while (n != 0)
     {
         printf("Qual opção deseja escolher ?\n");
         printf(" 1 - Cadastrar\n 2 - Listar\n 3 - Buscar\n 0 - Sair\n");
         scanf("%d", &n);
+        getchar();
         switch (n)
         {
         case 1:
-            printf("Opção cadastrar ainda não existe\n\n");
+            cadastrar_produto(&prateleira1);
             break;
         case 2:
             printf("Opção listar ainda não existe\n\n");
