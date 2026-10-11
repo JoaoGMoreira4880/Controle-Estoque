@@ -128,7 +128,12 @@ int main (){
     {
         printf("Qual opção deseja escolher ?\n");
         printf(" 1 - Cadastrar\n 2 - Listar\n 3 - Buscar\n 0 - Sair\n");
-        scanf("%d", &n);
+        if (scanf("%d", &n) != 1)
+        {
+            while (getchar() != '\n');
+            printf("Opção inválida !\n");
+            continue;
+        }
         getchar();
         switch (n)
         {
