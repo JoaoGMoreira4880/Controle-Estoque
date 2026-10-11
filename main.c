@@ -22,6 +22,20 @@ int meu_strlen (char *s){
     }
 return contador;
 }
+int ler_int(char *mensagem){
+    int valor;
+    int ok;
+    do {
+        printf("%s", mensagem);
+        ok = scanf("%d", &valor);
+        while (getchar() != '\n');
+        if (ok != 1)
+        {
+            printf("Valor inválido, tente de novo.\n");
+        }
+    } while (ok == 1);
+return valor;
+}
 void tirar_enter(char *s){
     int k = 0;
     int length = meu_strlen(s);
@@ -35,7 +49,6 @@ void tirar_enter(char *s){
     }
 }
 int meu_strcmp(char *a, char *b){
-
     while (*a != '\0' && *a == *b)
     {
         a++;
@@ -98,11 +111,19 @@ void cadastrar_produto (struct prateleira *p){
     fgets(p->produtos[pos].nome, 50, stdin);
     tirar_enter(p->produtos[pos].nome);
     printf("Qual o preço do produto ?\n");
-    scanf("%f", &p->produtos[pos].preco);
-    getchar();
+    if (scanf("%f", &p->produtos[pos].preco) != 1)
+    {
+        while (getchar() != '\n');
+        printf("Preço inválida !\n");
+        return;
+    }
     printf("Qual a quantidade do produto ?\n");
-    scanf("%d", &p->produtos[pos].quantidade);
-    getchar();
+    if (scanf("%d", &p->produtos[pos].quantidade) != 1)
+    {
+        while (getchar() != '\n');
+        printf("Quantidade inválida !\n");
+        return;
+    }
     p->quantidade++; 
 }
 void listar_produto (struct prateleira *p){
@@ -147,7 +168,7 @@ void buscar_produto (struct prateleira *p){
             return;
         }
 }
-int main (){
+/*int main (){
     int n = 1;
     struct prateleira prateleira1;
     prateleira1.quantidade = 0;
@@ -203,5 +224,10 @@ int main (){
     }
     free(prateleira1.produtos);
     prateleira1.produtos = NULL;
+return 0;
+}*/int main(){
+
+    int n = ler_int("Digite um número: \n");
+    printf("%d", n);
 return 0;
 }
