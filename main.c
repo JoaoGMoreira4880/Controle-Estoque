@@ -2,6 +2,17 @@
 #include <stdlib.h>
 #include <string.h>
 
+struct produto {
+    char nome [50];
+    int quantidade;
+    float preco;
+};
+struct prateleira {
+    char gama_produtos [50];
+    int capacidade;
+    int quantidade;
+    struct produto *produtos;
+};
 int meu_strlen (char *s){
     int contador = 0;
     while (*s != '\0')
@@ -37,17 +48,45 @@ int meu_strcmp(char *a, char *b){
         return 0;
     }
 }
-struct produto {
-    char nome [50];
-    int quantidade;
-    float preco;
-};
-struct prateleira {
-    char gama_produtos [50];
-    int capacidade;
-    int quantidade;
-    struct produto *produtos;
-};
+int achar_posicao(struct prateleira *p, char *nome){
+    int i = 0;
+    for (i = 0; i < p->quantidade; i++)
+    {
+        if (meu_strcmp(nome, p->produtos[i].nome))
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+void remover_produto (struct prateleira *p){
+    if (p->quantidade == 0)
+    {
+        printf("Não ha produtos cadastrados !\n");
+        return;
+    }
+    char nome_buscado [50];
+    printf("Qual o nome do produto que deseja remover ?\n");
+    fgets(nome_buscado, 50, stdin);
+    tirar_enter(nome_buscado);
+    int pos = achar_posicao(p, nome_buscado);
+    if (pos == -1)
+    {
+        printf("Produto não encontrado !\n");
+        return;
+    }
+    printf("O produto :\n");
+    printf("%s\n",p->produtos[pos].nome);
+    printf("Preço: %.2f\n", p->produtos[pos].preco);
+    printf("Quantidade: %d\n", p->produtos[pos].quantidade);
+    printf("Foi removido !\n");
+    int i = 0;
+    for (i = pos; i < (p->quantidade - 1); i++)
+    {
+        p->produtos[i] = p->produtos[i + 1];
+    }
+    p->quantidade--;
+}
 void cadastrar_produto (struct prateleira *p){
     int pos = p->quantidade; 
     if (p->quantidade >= p->capacidade)
@@ -77,7 +116,7 @@ void listar_produto (struct prateleira *p){
         printf("Nome: %s\n", p->produtos[i].nome);
         printf("Quantidade em estoque: %d\n", p->produtos[i].quantidade);
         printf("Preço: %.2f\n", p->produtos[i].preco);
-        printf("------------------------------------------------------");
+        printf("------------------------------------------------------\n");
     }
 }
 void buscar_produto (struct prateleira *p){
@@ -116,7 +155,12 @@ int main (){
     fgets(prateleira1.gama_produtos, 50, stdin);
     tirar_enter(prateleira1.gama_produtos);
     printf("Quantos produtos cabem na prateleira ?\n");
-    scanf("%d", &prateleira1.capacidade);
+    if (scanf("%d", &prateleira1.capacidade) != 1)
+    {
+        while (getchar() != '\n');
+        printf("Opção inválida !\n");
+        return 1;
+    }
     prateleira1.produtos = NULL;
     prateleira1.produtos = malloc(prateleira1.capacidade * sizeof(struct produto));
     if (prateleira1.produtos == NULL)
@@ -127,7 +171,7 @@ int main (){
     while (n != 0)
     {
         printf("Qual opção deseja escolher ?\n");
-        printf(" 1 - Cadastrar\n 2 - Listar\n 3 - Buscar\n 0 - Sair\n");
+        printf(" 1 - Cadastrar\n 2 - Listar\n 3 - Buscar\n 4 - Remover\n 0 - Sair\n");
         if (scanf("%d", &n) != 1)
         {
             while (getchar() != '\n');
@@ -145,6 +189,9 @@ int main (){
             break;
         case 3:
             buscar_produto(&prateleira1);
+            break;
+        case 4:
+            remover_produto(&prateleira1);
             break;
         case 0:
             printf("Agradecemos seu tempo :)\n\n");
