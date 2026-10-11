@@ -38,7 +38,7 @@ void cadastrar_produto (struct prateleira *p){
     int pos = p->quantidade; 
     if (p->quantidade >= p->capacidade)
     {
-        printf("A prateleira está cheia !\n");
+        printf("A prateleira está cheia !\n\n");
         return;
     }
     printf("Digite o nome do produto: \n");
@@ -51,9 +51,20 @@ void cadastrar_produto (struct prateleira *p){
     scanf("%d", &p->produtos[pos].quantidade);
     getchar();
     p->quantidade++; 
-    printf("[%s] guardado na posicao %d\n", p->produtos[pos].nome, pos);
 }
-
+void listar_produto (struct prateleira *p){
+    int i = 0;
+    if (p->quantidade == 0)
+    {
+        printf("Não ha produtos cadastrados !\n");
+    }
+    for (i = 0; i < p->quantidade; i++)
+    {
+        printf("Nome: %s\n", p->produtos[i].nome);
+        printf("Quantidade em estoque: %d\n", p->produtos[i].quantidade);
+        printf("Preço: %.2f\n", p->produtos[i].preco); 
+    }
+}
 int main (){
     int n = 1;
     struct prateleira prateleira1;
@@ -82,7 +93,7 @@ int main (){
             cadastrar_produto(&prateleira1);
             break;
         case 2:
-            printf("Opção listar ainda não existe\n\n");
+            listar_produto(&prateleira1);
             break;
         case 3:
             printf("Opção buscar ainda não existe\n\n");
