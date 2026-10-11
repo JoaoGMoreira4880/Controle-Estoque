@@ -23,6 +23,20 @@ void tirar_enter(char *s){
         }
     }
 }
+int meu_strcmp(char *a, char *b){
+
+    while (*a != '\0' && *a == *b)
+    {
+        a++;
+        b++;
+    }
+    if (*a == *b)
+    {
+        return 1;
+    }else{
+        return 0;
+    }
+}
 struct produto {
     char nome [50];
     int quantidade;
@@ -62,8 +76,37 @@ void listar_produto (struct prateleira *p){
     {
         printf("Nome: %s\n", p->produtos[i].nome);
         printf("Quantidade em estoque: %d\n", p->produtos[i].quantidade);
-        printf("Preço: %.2f\n", p->produtos[i].preco); 
+        printf("Preço: %.2f\n", p->produtos[i].preco);
+        printf("------------------------------------------------------");
     }
+}
+void buscar_produto (struct prateleira *p){
+    int achou = 0;
+    int i = 0;
+    char produto_temp[50];
+    if (p->quantidade == 0)
+    {
+        printf("Não ha produtos cadastrados !\n");
+        return;
+    }
+    printf("Qual produto deseja buscar ?\n");
+    fgets(produto_temp, 50, stdin);
+    tirar_enter(produto_temp);
+
+    for (i = 0; i < p->quantidade; i++){
+        if (meu_strcmp(produto_temp, p->produtos[i].nome))
+        {
+            printf("Nome: %s\n", p->produtos[i].nome);
+            printf("Quantidade em estoque: %d\n", p->produtos[i].quantidade);
+            printf("Preço: %.2f\n", p->produtos[i].preco);
+            achou = 1;
+        }
+    }
+    if (achou == 0)
+        {
+            printf("Produto não encontrado !\n");
+            return;
+        }
 }
 int main (){
     int n = 1;
@@ -96,7 +139,7 @@ int main (){
             listar_produto(&prateleira1);
             break;
         case 3:
-            printf("Opção buscar ainda não existe\n\n");
+            buscar_produto(&prateleira1);
             break;
         case 0:
             printf("Agradecemos seu tempo :)\n\n");
