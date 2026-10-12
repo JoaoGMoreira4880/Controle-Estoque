@@ -29,11 +29,11 @@ int ler_int(char *mensagem){
         printf("%s", mensagem);
         ok = scanf("%d", &valor);
         while (getchar() != '\n');
-        if (ok != 1)
+        if (ok != 1 || valor <= -1)
         {
             printf("Valor inválido, tente de novo.\n");
         }
-    } while (ok == 0);
+    } while (ok == 0 || valor <= -1);
 return valor;
 }
 float ler_float(char *mensagem){
@@ -43,12 +43,21 @@ float ler_float(char *mensagem){
         printf("%s", mensagem);
         ok = scanf("%f", &valor);
         while (getchar() != '\n');
-        if (ok != 1)
+        if (ok != 1 || valor <= -1)
         {
             printf("Valor inválido, tente de novo.\n");
         }
-    } while (ok == 0);
+    } while (ok == 0 || valor <= -1);
 return valor;
+}
+void meu_strcpy(char *destino, char *origem){
+    while (*origem != '\0')
+    {
+        *destino = *origem;
+        origem  = origem + 1;
+        destino = destino + 1;
+    }
+    *destino = '\0';
 }
 void tirar_enter(char *s){
     int k = 0;
@@ -85,6 +94,50 @@ int achar_posicao(struct prateleira *p, char *nome){
         }
     }
     return -1;
+}
+void editar_produto (struct prateleira *p){
+    if (p->quantidade == 0)
+    {
+        printf("Não ha produtos cadastrados !\n");
+        return;
+    }
+    char nome_editar [50];
+    printf("Qual o nome do produto que deseja editar ?\n");
+    fgets(nome_editar, 50, stdin);
+    tirar_enter(nome_editar);
+    int posicao = achar_posicao(p, nome_editar);
+    if (posicao == -1)
+    {
+        printf("Produto não encontrado !\n");
+        return;
+    }
+    printf("Os dados atuais do produto :\n");
+    printf("%s\n",p->produtos[posicao].nome);
+    printf("Preço: %.2f\n", p->produtos[posicao].preco);
+    printf("Quantidade: %d\n", p->produtos[posicao].quantidade);
+    char novo_nome [50];
+    printf("Digite o novo nome do produto: \n");
+    fgets(novo_nome, 50, stdin);
+    tirar_enter(novo_nome);
+    int repetido = achar_posicao(p, novo_nome);
+    if (repetido != -1 && repetido != posicao)
+    {
+        printf("Esse nome já existe no produto: \n");
+        printf("Nome: %s\n",p->produtos[repetido].nome);
+        printf("Preço: %.2f\n", p->produtos[repetido].preco);
+        printf("Quantidade: %d\n", p->produtos[repetido].quantidade);
+        printf("Posição: %d\n", repetido);
+        return;
+    }
+    float novo_preco = ler_float("Digite aqui o novo preço: \n");
+    int nova_quantidade = ler_int("Digite aqui a nova quantidade: \n");
+    p->produtos[posicao].preco = novo_preco;
+    p->produtos[posicao].quantidade = nova_quantidade;
+    meu_strcpy(p->produtos[posicao].nome, novo_nome);
+    printf("Os dados atualizados do produto :\n");
+    printf("%s\n",p->produtos[posicao].nome);
+    printf("Preço: %.2f\n", p->produtos[posicao].preco);
+    printf("Quantidade: %d\n", p->produtos[posicao].quantidade);
 }
 void remover_produto (struct prateleira *p){
     if (p->quantidade == 0)
@@ -188,7 +241,7 @@ int main (){
     while (n != 0)
     {
         printf("Qual opção deseja escolher ?\n");
-        n = ler_int(" 1 - Cadastrar\n 2 - Listar\n 3 - Buscar\n 4 - Remover\n 0 - Sair\n");
+        n = ler_int(" 1 - Cadastrar\n 2 - Listar\n 3 - Buscar\n 4 - Remover\n 5 - Editar\n 0 - Sair\n");
         switch (n)
         {
         case 1:
@@ -202,6 +255,9 @@ int main (){
             break;
         case 4:
             remover_produto(&prateleira1);
+            break;
+        case 5:
+            editar_produto(&prateleira1);
             break;
         case 0:
             printf("Agradecemos seu tempo :)\n\n");
