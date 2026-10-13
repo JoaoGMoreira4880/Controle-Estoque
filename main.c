@@ -174,9 +174,21 @@ void cadastrar_produto (struct prateleira *p){
         printf("A prateleira está cheia !\n\n");
         return;
     }
+    char nome_temp [50];
     printf("Digite o nome do produto: \n");
-    fgets(p->produtos[pos].nome, 50, stdin);
-    tirar_enter(p->produtos[pos].nome);
+    fgets(nome_temp, 50, stdin);
+    tirar_enter(nome_temp);
+    int n = achar_posicao(p, nome_temp);
+    if (n != -1)
+    {
+        printf("Esse nome já existe no produto: \n");
+        printf("Nome: %s\n",p->produtos[n].nome);
+        printf("Preço: %.2f\n", p->produtos[n].preco);
+        printf("Quantidade: %d\n", p->produtos[n].quantidade);
+        printf("Posição: %d\n", n);
+        return;
+    }
+    meu_strcpy(p->produtos[pos].nome, nome_temp);
     p->produtos[pos].preco = ler_float("Qual o preço do produto ?\n");
     p->produtos[pos].quantidade = ler_int("Qual a quantidade do produto ?\n");
     p->quantidade++; 
