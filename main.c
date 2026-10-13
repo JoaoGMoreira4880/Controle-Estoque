@@ -126,7 +126,7 @@ void editar_produto (struct prateleira *p){
         printf("Nome: %s\n",p->produtos[repetido].nome);
         printf("Preço: %.2f\n", p->produtos[repetido].preco);
         printf("Quantidade: %d\n", p->produtos[repetido].quantidade);
-        printf("Posição: %d\n", repetido);
+        printf("Posição: %d\n", repetido + 1);
         return;
     }
     float novo_preco = ler_float("Digite aqui o novo preço: \n");
@@ -178,14 +178,20 @@ void cadastrar_produto (struct prateleira *p){
     printf("Digite o nome do produto: \n");
     fgets(nome_temp, 50, stdin);
     tirar_enter(nome_temp);
-    int n = achar_posicao(p, nome_temp);
-    if (n != -1)
+    int tamanho = meu_strlen(nome_temp);
+    if (tamanho < 1)
+    {
+        printf("Nome inválido !\n");
+        return;
+    }
+    int n_repetido = achar_posicao(p, nome_temp);
+    if (n_repetido != -1)
     {
         printf("Esse nome já existe no produto: \n");
-        printf("Nome: %s\n",p->produtos[n].nome);
-        printf("Preço: %.2f\n", p->produtos[n].preco);
-        printf("Quantidade: %d\n", p->produtos[n].quantidade);
-        printf("Posição: %d\n", n);
+        printf("Nome: %s\n",p->produtos[n_repetido].nome);
+        printf("Preço: %.2f\n", p->produtos[n_repetido].preco);
+        printf("Quantidade: %d\n", p->produtos[n_repetido].quantidade);
+        printf("Posição: %d\n", n_repetido + 1);
         return;
     }
     meu_strcpy(p->produtos[pos].nome, nome_temp);
