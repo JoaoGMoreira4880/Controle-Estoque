@@ -246,7 +246,7 @@ void buscar_produto (struct prateleira *p){
             printf("Produto não encontrado !\n");
             return;
         }
-}/*
+}
 int main (){
     int n = 1;
     struct prateleira prateleira1;
@@ -294,29 +294,4 @@ int main (){
     free(prateleira1.produtos);
     prateleira1.produtos = NULL;
 return 0;
-}*/
-int read_int ( char *mensagem){
-    char entrada[100];
-    char *fim;
-    printf("%s", mensagem);
-    fgets(entrada, sizeof(entrada), stdin);
-    long valor = strtol(entrada, &fim, 10);
-    while (valor == 0)
-    {
-        if (fim == entrada) {
-            printf("Nenhum número foi digitado.\n");
-            continue;
-        }
-        while (*fim == ' ' || *fim == '\n') {
-            fim++;
-        }
-        if (*fim == '\0') {
-            printf("Entrada inválida.\n");
-            continue;
-        }
-        else {
-            printf("Número convertido: %ld\n", valor);
-        }
-    }
-return (int)valor;
 }
