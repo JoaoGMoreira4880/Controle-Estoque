@@ -211,6 +211,11 @@ void listar_produto (struct prateleira *p){
     {
         printf("Não ha produtos cadastrados !\n");
     }
+    if (p->produtos == NULL)
+    {
+        printf("Não existem produtos cadastrados !\n");
+        return;
+    }
     for (i = 0; i < p->quantidade; i++)
     {
         printf("Nome: %s\n", p->produtos[i].nome);
@@ -247,6 +252,118 @@ void buscar_produto (struct prateleira *p){
             return;
         }
 }
+void salvar_produtos (struct prateleira *p) {
+    int i = 0;
+    FILE *arq = fopen("estoque.txt", "w");
+    if (arq == NULL)
+    {
+        printf("Não foi possivel abrir o arquivo !\n");
+        return;
+    }
+    fprintf(arq, "%d\n", p->capacidade);
+    fprintf(arq, "%s\n", p->gama_produtos);
+    fprintf(arq, "%d\n",p->quantidade);
+    for (i = 0; i < p->quantidade; i++)
+    {
+        fprintf(arq, "%s\n", p->produtos[i].nome);
+        fprintf(arq, "%.2f\n", p->produtos[i].preco);
+        fprintf(arq, "%d\n", p->produtos[i].quantidade);
+    }
+    fclose(arq);
+    printf("Produtos salvos !\n");
+}
+int carregar_estoque(struct prateleira *p){
+    int i = 0;
+    struct prateleira temp = {0};
+    FILE *arq = fopen("estoque.txt", "r");
+    if (arq == NULL)
+    {
+        return 0;
+    }
+    int n_temp = 0;
+    if (fscanf(arq, "%d", &n_temp) != 1)
+    {
+        printf("Falha no carregamento !\n");
+        fclose(arq);
+        return 0;
+    }
+    fgetc(arq);
+    if (n_temp <= 0)
+    {
+        printf("Falha no carregamento !\n");
+        fclose(arq);
+        return 0;
+    }
+    temp.capacidade = n_temp;
+    if (fgets(temp.gama_produtos, 50, arq) == NULL)
+    {
+        printf("Falha no carregamento !\n");
+        fclose(arq);
+        free(temp.produtos);
+        return 0;
+    }
+    tirar_enter(temp.gama_produtos);
+    int nova_quantidade = 0;
+    if (fscanf(arq, "%d", &nova_quantidade) != 1)
+    {
+        printf("Falha no carregamento !\n");
+        fclose(arq);
+        free(temp.produtos);
+        return 0;
+    }
+    fgetc(arq);
+    if (nova_quantidade < 0)
+    {
+        printf("Falha no carregamento !\n");
+        fclose(arq);
+        return 0;
+    }
+    if (nova_quantidade > temp.capacidade)
+    {
+        printf("Pouco espaço para alocar os produtos !\n");
+        fclose(arq);
+        return 0;
+    }
+    temp.produtos = malloc(nova_quantidade * sizeof(struct produto));
+    if (temp.produtos == NULL)
+    {
+        printf("Falha na alocação !\n");
+        fclose(arq);
+        return 0;
+    }
+    for (i = temp.quantidade; i < nova_quantidade; i++)
+    {
+        if (fgets(temp.produtos[i].nome, 50, arq) == NULL)
+        {
+            printf("Falha no carregamento !\n");
+            fclose(arq);
+            free(temp.produtos);
+            temp.produtos = NULL;
+            return 0;
+        }
+        tirar_enter(temp.produtos[i].nome);
+        if (fscanf(arq, "%f", &temp.produtos[i].preco) != 1)
+        {
+            printf("Falha no carregamento !\n");
+            fclose(arq);
+            free(temp.produtos);
+            temp.produtos = NULL;
+            return 0;
+        }
+        fgetc(arq);
+        if (fscanf(arq,"%d", &temp.produtos[i].quantidade) != 1)
+        {
+            printf("Falha no carregamento !\n");
+            fclose(arq);
+            free(temp.produtos);
+            temp.produtos = NULL;
+            return 0;
+        }
+        fgetc(arq);
+    }
+    fclose(arq);
+    return 1;
+}
 int main (){
     int n = 1;
     struct prateleira prateleira1;
@@ -265,7 +382,7 @@ int main (){
     while (n != 0)
     {
         printf("Qual opção deseja escolher ?\n");
-        n = ler_int(" 1 - Cadastrar\n 2 - Listar\n 3 - Buscar\n 4 - Remover\n 5 - Editar\n 0 - Sair\n");
+        n = ler_int(" 1 - Cadastrar\n 2 - Listar\n 3 - Buscar\n 4 - Remover\n 5 - Editar\n 6 - Salvar\n 7 - Carregar Estoque\n 0 - Sair\n");
         switch (n)
         {
         case 1:
@@ -282,6 +399,12 @@ int main (){
             break;
         case 5:
             editar_produto(&prateleira1);
+            break;
+        case 6:
+            salvar_produtos(&prateleira1);
+            break;
+        case 7:
+            carregar_estoque(&prateleira1);
             break;
         case 0:
             printf("Agradecemos seu tempo :)\n\n");

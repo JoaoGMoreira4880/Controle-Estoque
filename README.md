@@ -15,6 +15,8 @@ Programa de controle de estoque desenvolvido em linguagem C e executado pelo ter
 É necessário ter o compilador GCC instalado.
 
 ```bash
+git clone https://github.com/JoaoGMoreira4880/Controle-Estoque.git
+cd Controle-Estoque
 gcc -Wall main.c -o controle-estoque
 ./controle-estoque
 ```
