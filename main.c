@@ -95,6 +95,17 @@ int achar_posicao(struct prateleira *p, char *nome){
     }
     return -1;
 }
+int buscar_indice(struct prateleira *p, char *nome)
+{
+    int i = 0;
+    for (i = 0; i < p->quantidade; i++){
+        if (meu_strcmp(nome, p->produtos[i].nome))
+        {
+            return i;
+        }
+    }
+return -1;
+}
 void editar_produto (struct prateleira *p){
     if (p->quantidade == 0)
     {
@@ -299,22 +310,27 @@ int carregar_estoque(struct prateleira *p){
     {
         printf("Falha no carregamento !\n");
         fclose(arq);
-        free(temp.produtos);
         return 0;
     }
     tirar_enter(temp.gama_produtos);
     int nova_quantidade = 0;
+    int produtos_novos = 0;
     if (fscanf(arq, "%d", &nova_quantidade) != 1)
     {
         printf("Falha no carregamento !\n");
         fclose(arq);
-        free(temp.produtos);
         return 0;
     }
     fgetc(arq);
     if (nova_quantidade < 0)
     {
         printf("Falha no carregamento !\n");
+        fclose(arq);
+        return 0;
+    }
+    if (nova_quantidade == 0)
+    {
+        printf("O arquivo deve ter pelo menos um produto !\n");
         fclose(arq);
         return 0;
     }
@@ -331,7 +347,7 @@ int carregar_estoque(struct prateleira *p){
         fclose(arq);
         return 0;
     }
-    for (i = temp.quantidade; i < nova_quantidade; i++)
+    for (i = 0; i < nova_quantidade; i++)
     {
         if (fgets(temp.produtos[i].nome, 50, arq) == NULL)
         {
@@ -361,6 +377,45 @@ int carregar_estoque(struct prateleira *p){
         }
         fgetc(arq);
     }
+    for (i = 0; i < nova_quantidade; i++)
+    {
+        int meu_indice = buscar_indice(p, temp.produtos[i].nome);
+        if (meu_indice == -1){
+            produtos_novos++;
+        }
+    }
+    int nova_total = p->quantidade + produtos_novos;
+    struct produto *novo_vetor;
+    if (nova_total > p->capacidade)
+    {
+        novo_vetor = realloc(p->produtos,nova_total * sizeof(struct produto));
+        if (novo_vetor == NULL)
+        {
+            printf("Problema !!\n");
+            fclose(arq);
+            free(temp.produtos);
+            return 0;
+        }
+    p->produtos = novo_vetor;
+    p->capacidade = nova_total;
+    }
+    for (i = 0; i < nova_quantidade; i++)
+    {
+        int meu_indice = buscar_indice(p, temp.produtos[i].nome);
+        if (meu_indice != -1)
+        {
+            p->produtos[meu_indice].quantidade += temp.produtos[i].quantidade;
+        }else{
+            p->produtos[p->quantidade] = temp.produtos[i];
+            p->quantidade++;
+        }
+    }
+    /*for (i = 0; i < nova_quantidade; i++)
+    {
+        p->produtos[p->quantidade + i] = temp.produtos[i];
+    }
+    p->quantidade = nova_total;*/
+    free(temp.produtos);
     fclose(arq);
     return 1;
 }
