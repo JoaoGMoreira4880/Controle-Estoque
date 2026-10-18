@@ -358,9 +358,25 @@ int carregar_estoque(struct prateleira *p){
             return 0;
         }
         tirar_enter(temp.produtos[i].nome);
+        if (temp.produtos[i].nome[0] == '\0')
+        {
+            printf("Falha no carregamento !\n");
+            fclose(arq);
+            free(temp.produtos);
+            temp.produtos = NULL;
+            return 0;
+        }
         if (fscanf(arq, "%f", &temp.produtos[i].preco) != 1)
         {
             printf("Falha no carregamento !\n");
+            fclose(arq);
+            free(temp.produtos);
+            temp.produtos = NULL;
+            return 0;
+        }
+        if (temp.produtos[i].preco <= 0)
+        {
+            printf("Preço inválido !\n");
             fclose(arq);
             free(temp.produtos);
             temp.produtos = NULL;
@@ -370,6 +386,14 @@ int carregar_estoque(struct prateleira *p){
         if (fscanf(arq,"%d", &temp.produtos[i].quantidade) != 1)
         {
             printf("Falha no carregamento !\n");
+            fclose(arq);
+            free(temp.produtos);
+            temp.produtos = NULL;
+            return 0;
+        }
+        if (temp.produtos[i].quantidade < 1)
+        {
+            printf("Quantidade inválida !\n");
             fclose(arq);
             free(temp.produtos);
             temp.produtos = NULL;
@@ -410,11 +434,6 @@ int carregar_estoque(struct prateleira *p){
             p->quantidade++;
         }
     }
-    /*for (i = 0; i < nova_quantidade; i++)
-    {
-        p->produtos[p->quantidade + i] = temp.produtos[i];
-    }
-    p->quantidade = nova_total;*/
     free(temp.produtos);
     fclose(arq);
     return 1;
