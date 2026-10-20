@@ -193,22 +193,34 @@ int buscar_indice(struct prateleira *p, char *nome)
 return -1;
 }
 void editar_produto (struct prateleira *p){
+    struct produto produto_editar;
     if (p->quantidade == 0)
     {
         printf("Não ha produtos cadastrados !\n");
         return;
     }
-    char nome_editar [50];
     printf("Qual o nome do produto que deseja editar ?\n");
-    fgets(nome_editar, 50, stdin);
-    tirar_enter(nome_editar);
-    int tamanho = meu_strlen(nome_editar);
+    if (fgets(produto_editar.nome, 50, stdin) == NULL)
+    {
+        printf("Erro na leitura do nome !\n");
+        return;
+    }
+    if (strchr(produto_editar.nome, '\n') == NULL)
+    {
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF){
+        }
+        printf("Texto muito longo !\n");
+        return;
+    }
+    tirar_enter(produto_editar.nome);
+    int tamanho = meu_strlen(produto_editar.nome);
     if (tamanho < 1)
     {
         printf("Nome inválido !\n");
         return;
     }
-    int posicao = achar_posicao(p, nome_editar);
+    int posicao = achar_posicao(p, produto_editar.nome);
     if (posicao == -1)
     {
         printf("Produto não encontrado !\n");
@@ -218,11 +230,28 @@ void editar_produto (struct prateleira *p){
     printf("%s\n",p->produtos[posicao].nome);
     printf("Preço: %.2f\n", p->produtos[posicao].preco);
     printf("Quantidade: %d\n", p->produtos[posicao].quantidade);
-    char novo_nome [50];
     printf("Digite o novo nome do produto: \n");
-    fgets(novo_nome, 50, stdin);
-    tirar_enter(novo_nome);
-    int repetido = achar_posicao(p, novo_nome);
+    if (fgets(produto_editar.nome, 50, stdin) == NULL)
+    {
+        printf("Erro na leitura do novo nome !\n");
+        return;
+    }
+    if (strchr(produto_editar.nome, '\n') == NULL)
+    {
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF){
+        }
+        printf("Texto muito longo !\n");
+        return;
+    }
+    tirar_enter(produto_editar.nome);
+    int tamanho_novo = meu_strlen(produto_editar.nome);
+    if (tamanho_novo < 1)
+    {
+        printf("Nome inválido !\n");
+        return;
+    }
+    int repetido = achar_posicao(p, produto_editar.nome);
     if (repetido != -1 && repetido != posicao)
     {
         printf("Esse nome já existe no produto: \n");
@@ -232,21 +261,17 @@ void editar_produto (struct prateleira *p){
         printf("Posição: %d\n", repetido + 1);
         return;
     }
-    float novo_preco = 0;
-    if (!ler_float("Digite aqui o novo preço: \n", &novo_preco))
+    if (!ler_float("Digite aqui o novo preço: \n", &produto_editar.preco))
     {
         printf("Erro na leitur ado preço !\n");
         return;
     }
-    int nova_quantidade = 0;
-    if (!ler_int("Digite aqui a nova quantidade: \n", &nova_quantidade))
+    if (!ler_int("Digite aqui a nova quantidade: \n", &produto_editar.quantidade))
     {
         printf("Erro na leitura da quantidade !\n");
         return;
     }
-    p->produtos[posicao].preco = novo_preco;
-    p->produtos[posicao].quantidade = nova_quantidade;
-    meu_strcpy(p->produtos[posicao].nome, novo_nome);
+    p->produtos[posicao] = produto_editar;
     printf("Os dados atualizados do produto :\n");
     printf("%s\n",p->produtos[posicao].nome);
     printf("Preço: %.2f\n", p->produtos[posicao].preco);
@@ -260,8 +285,26 @@ void remover_produto (struct prateleira *p){
     }
     char nome_buscado [50];
     printf("Qual o nome do produto que deseja remover ?\n");
-    fgets(nome_buscado, 50, stdin);
+    if (fgets(nome_buscado, 50, stdin) == NULL)
+    {
+        printf("Erro na leitura do nome !\n");
+        return;
+    }
+    if (strchr(nome_buscado, '\n') == NULL)
+    {
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF){
+        }
+        printf("Texto muito longo !\n");
+        return;
+    }
     tirar_enter(nome_buscado);
+    int tamanho = meu_strlen(nome_buscado);
+    if (tamanho < 1)
+    {
+        printf("Nome inválido !\n");
+        return;
+    }
     int pos = achar_posicao(p, nome_buscado);
     if (pos == -1)
     {
@@ -282,22 +325,34 @@ void remover_produto (struct prateleira *p){
 }
 void cadastrar_produto (struct prateleira *p){
     int pos = p->quantidade; 
+    struct produto produto_temp;
     if (p->quantidade >= p->capacidade)
     {
         printf("A prateleira está cheia !\n\n");
         return;
     }
-    char nome_temp [50];
     printf("Digite o nome do produto: \n");
-    fgets(nome_temp, 50, stdin);
-    tirar_enter(nome_temp);
-    int tamanho = meu_strlen(nome_temp);
+    if (fgets(produto_temp.nome, 50, stdin) == NULL)
+    {
+        printf("Erro na leitur ado nome !\n");
+        return;
+    }
+    if (strchr(produto_temp.nome, '\n') == NULL)
+    {
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF){
+        }
+        printf("Texto muito longo !\n");
+        return;
+    }
+    tirar_enter(produto_temp.nome);
+    int tamanho = meu_strlen(produto_temp.nome);
     if (tamanho < 1)
     {
         printf("Nome inválido !\n");
         return;
     }
-    int n_repetido = achar_posicao(p, nome_temp);
+    int n_repetido = achar_posicao(p, produto_temp.nome);
     if (n_repetido != -1)
     {
         printf("Esse nome já existe no produto: \n");
@@ -307,17 +362,17 @@ void cadastrar_produto (struct prateleira *p){
         printf("Posição: %d\n", n_repetido + 1);
         return;
     }
-    meu_strcpy(p->produtos[pos].nome, nome_temp);
-    if (!ler_float("Qual o preço do produto ?\n", &p->produtos[pos].preco))
+    if (!ler_float("Qual o preço do produto ?\n", &produto_temp.preco))
     {
         printf("Erro na leitura do preço !\n");
         return;
     }
-    if (!ler_int("Qual a quantidade do produto ?\n", &p->produtos[pos].quantidade))
+    if (!ler_int("Qual a quantidade do produto ?\n", &produto_temp.quantidade))
     {
         printf("Erro na leitura da quantidade !\n");
         return;
     }
+    p->produtos[pos] = produto_temp;
     p->quantidade++; 
 }
 void listar_produto (struct prateleira *p){
@@ -611,6 +666,7 @@ int carregar_estoque(struct prateleira *p){
             p->quantidade++;
         }
     }
+    temp.produtos = NULL;
     free(temp.produtos);
     fclose(arq);
     return 1;
