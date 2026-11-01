@@ -128,9 +128,9 @@ float ler_float(char *mensagem, float *resultado){
             printf("Erro na leitura, tente novamente !\n");
             continue;
         }
-        if (valor < 0)
+        if (valor < 0.01f)
         {
-            printf("Valor inválido, digite um número não negativo !\n");
+            printf("Valor inválido, digite um número maior !\n");
             continue;
         }
         *resultado = valor;
@@ -264,7 +264,7 @@ void editar_produto (struct prateleira *p){
     }
     if (!ler_float("Digite aqui o novo preço: \n", &produto_editar.preco))
     {
-        printf("Erro na leitur ado preço !\n");
+        printf("Erro na leitura do preço !\n");
         return;
     }
     if (!ler_int("Digite aqui a nova quantidade: \n", &produto_editar.quantidade))
