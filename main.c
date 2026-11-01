@@ -789,8 +789,7 @@ int carregar_estoque(struct prateleira *p){
 int main (){
     int n = 1;
     int resultado = 0;
-    struct prateleira prateleira1;
-    prateleira1.quantidade = 0;
+    struct prateleira prateleira1 = {0};
     printf("Qual prateleira seria ?\n");
     fgets(prateleira1.gama_produtos, 50, stdin);
     tirar_enter(prateleira1.gama_produtos);
@@ -812,7 +811,6 @@ int main (){
         resultado = 1;
         goto limpeza;
     }
-    prateleira1.produtos = NULL;
     prateleira1.produtos = malloc((size_t)prateleira1.capacidade * sizeof(struct produto));
     if (prateleira1.produtos == NULL)
     {
@@ -861,6 +859,7 @@ int main (){
         }
     }
     limpeza:
+        printf("produtos = %p\n", (void*)prateleira1.produtos);
         free(prateleira1.produtos);
         prateleira1.produtos = NULL;
         return resultado;
