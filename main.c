@@ -214,7 +214,7 @@ int ler_linha_float(FILE *arq, float *saida){
     }
     if (fim == linha)
     {
-        printf("Leitura inválida, linha vazia !\n");
+        printf("Leitura inválida, nenhum número na linha !\n");
         return 0;
     }
     while (isspace((unsigned char)*fim))
@@ -249,6 +249,30 @@ void tirar_enter(char *s){
             break;
         }
     }
+}
+
+int ler_linha_texto (FILE *arq, char *saida, int tamanho){
+    char texto [tamanho];
+
+    if (fgets(texto, 100, arq) == NULL)
+    {
+        printf("Problema na leitura da linha !\n");
+        return 0;
+    }
+    if (strchr(texto, '\n') == NULL)
+    {
+        printf("Texto muito longo !\n");
+        return 0;
+    }
+    tirar_enter(texto);
+    int tamanho_texto = meu_strlen(texto);
+    if (tamanho_texto >= tamanho)
+    {
+        printf("Texto muito grande !\n");
+        return 0;
+    }
+    meu_strcpy(saida, texto);
+    return 1;
 }
 int meu_strcmp(char *a, char *b){
     while (*a != '\0' && *a == *b)
