@@ -111,7 +111,7 @@ float ler_float(char *mensagem, float *resultado){
         }
         if (!isfinite(valor))
         {
-            printf("Númeor inválido !\n");
+            printf("Número inválido !\n");
             continue;
         }
         if (fim == entrada)
@@ -618,7 +618,6 @@ int carregar_estoque(struct prateleira *p){
     }
     tirar_enter(temp.gama_produtos);
     int nova_quantidade = 0;
-    int produtos_novos = 0;
     if (fscanf(arq, "%d", &nova_quantidade) != 1)
     {
         printf("Falha no carregamento !\n");
@@ -690,6 +689,14 @@ int carregar_estoque(struct prateleira *p){
             temp.produtos = NULL;
             return 0;
         }
+        if (strcmp(temp.produtos[i].nome, p->produtos[i].nome) == 0)
+        {
+            printf("Produto duplicado no arquivo, falha no carregamento !\n");
+            fclose(arq);
+            free(temp.produtos);
+            temp.produtos = NULL;
+            return 0;
+        }
         char preco [50];
         char *fim;
         if (fgets(preco, sizeof(preco), arq) == NULL)
@@ -741,7 +748,7 @@ int carregar_estoque(struct prateleira *p){
                 return 0;
             }
         }
-        if (temp.produtos[i].preco <= 0 || isfinite(temp.produtos[i].preco) == 0)
+        if (!temp.produtos[i].preco >= 0.01f || isfinite(temp.produtos[i].preco) == 0)
         {
             printf("Preço inválido !\n");
             fclose(arq);
@@ -757,7 +764,7 @@ int carregar_estoque(struct prateleira *p){
             temp.produtos = NULL;
             return 0;
         }
-        if (temp.produtos[i].quantidade < 1)
+        if (temp.produtos[i].quantidade < 0)
         {
             printf("Quantidade inválida !\n");
             fclose(arq);
@@ -768,56 +775,17 @@ int carregar_estoque(struct prateleira *p){
         int c;
         while ((c = fgetc(arq)) != '\n' && c != EOF)
         {
-            fgetc(arq);
         }
         if (c == EOF)
         {
             printf("ERRO, Fim do arquivo !\n");
             fclose(arq);
+            free(temp.produtos);
+            temp.produtos = NULL;
             return 0;
         }
     }
-    for (i = 0; i < nova_quantidade; i++)
-    {
-        if (temp.produtos[i].quantidade == 0)
-        {
-            continue;
-        }
-        for (j = 0; j < i; j++)
-        {
-            if (temp.produtos[j].quantidade == 0)
-            {
-                continue;
-            }
-            if (strcmp(temp.produtos[i].nome, temp.produtos[j].nome) == 0)
-            {
-                if (temp.produtos[i].quantidade > INT_MAX - temp.produtos[j].quantidade)
-                {
-                    printf("Valor excedeu o limite superior !\n");
-                    fclose(arq);
-                    free(temp.produtos);
-                    temp.produtos = NULL;
-                    return 0;
-                }
-                temp.produtos[j].quantidade += temp.produtos[i].quantidade;
-                temp.produtos[j].preco = temp.produtos[i].preco;
-                temp.produtos[i].quantidade = 0;
-                break;
-            }
-        }
-    }
-    for (i = 0; i < nova_quantidade; i++)
-    {
-        if (temp.produtos[i].quantidade == 0)
-        {
-            continue;
-        }
-        if (buscar_indice(p, temp.produtos[i].nome) == -1)
-        {
-            produtos_novos++;
-        }
-    }
-    if (p->quantidade < 0 || produtos_novos < 0)
+    if (p->quantidade < 0)
     {
         printf("Valores menores que zero não são aceitos !\n");
         fclose(arq);
@@ -825,15 +793,7 @@ int carregar_estoque(struct prateleira *p){
         temp.produtos = NULL;
         return 0;
     }
-    if (produtos_novos > INT_MAX - p->quantidade)
-    {
-        printf("Valores muito grandes !\n");
-        fclose(arq);
-        free(temp.produtos);
-        temp.produtos = NULL;
-        return 0;
-    }
-    int nova_total = p->quantidade + produtos_novos;
+    int nova_total = p->quantidade;
     struct produto *novo_vetor;
     if ((size_t)nova_total > (SIZE_MAX / sizeof(struct produto)))
     {
@@ -846,20 +806,13 @@ int carregar_estoque(struct prateleira *p){
     for (i = 0; i < nova_quantidade; i++)
     {
         int meu_indice = buscar_indice(p, temp.produtos[i].nome);
-        if (temp.produtos[i].quantidade == 0)
+        if (temp.produtos[i].quantidade > INT_MAX - p->produtos[meu_indice].quantidade)
         {
-            continue;
-        }
-        if (meu_indice != -1)
-        {
-            if (temp.produtos[i].quantidade > INT_MAX - p->produtos[meu_indice].quantidade)
-            {
-                printf("Valor excedeu o limite superior !\n");
-                fclose(arq);
-                free(temp.produtos);
-                temp.produtos = NULL;
-                return 0;
-            }
+            printf("Valor excedeu o limite superior !\n");
+            fclose(arq);
+            free(temp.produtos);
+            temp.produtos = NULL;
+            return 0;
         }
     }
     int capacidade_final = temp.capacidade;
@@ -880,22 +833,6 @@ int carregar_estoque(struct prateleira *p){
         }
         p->produtos = novo_vetor;
         p->capacidade = capacidade_final;
-    }
-    for (i = 0; i < nova_quantidade; i++)
-    {
-        int meu_indice = buscar_indice(p, temp.produtos[i].nome);
-        if (temp.produtos[i].quantidade == 0)
-        {
-            continue;
-        }
-        if (meu_indice != -1)
-        {
-            p->produtos[meu_indice].quantidade += temp.produtos[i].quantidade;
-            p->produtos[meu_indice].preco = temp.produtos[i].preco;
-        }else{
-            p->produtos[p->quantidade] = temp.produtos[i];
-            p->quantidade++;
-        }
     }
     free(temp.produtos);
     temp.produtos = NULL;
